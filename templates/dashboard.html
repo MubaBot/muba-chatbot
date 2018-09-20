@@ -1,0 +1,9 @@
+{% extends 'layout.html' %}
+{% import 'memo.html' as memo %}
+{% block title %}
+    chatting
+{% endblock %}
+{% block content %}
+    {{ memo.memo(memos) }}
+{#    {{ scoreboard.scoreboard(teams) }}#}
+{% endblock %}

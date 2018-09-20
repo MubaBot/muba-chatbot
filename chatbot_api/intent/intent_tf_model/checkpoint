@@ -1,0 +1,2 @@
+model_checkpoint_path: "/home/say2/chatbot/chatbot_api/intent/intent_tf_model/hihi"
+all_model_checkpoint_paths: "/home/say2/chatbot/chatbot_api/intent/intent_tf_model/hihi"

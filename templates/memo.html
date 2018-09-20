@@ -1,0 +1,73 @@
+{% macro memo(memos) %}
+    <div class="row">
+        <div class="column" style="height: 500px">
+
+            <div class="ui tiny divided list" id="memos" style="overflow-y: auto; height: 100%">
+                {% for memo in memos %}
+                    <div class="item" id="memo-{{ memo.id }}">
+                        <span> {{ memo.text }} </span>
+                        <div style="float: right"> {{ memo.timestamp.strftime('%c') }} </div>
+                    </div>
+                {% endfor %}
+            </div>
+            <form class="ui form" action="/add_memo" onsubmit="return submit_memo(this);">
+                <div class="field">
+                    <input type="text" name="text" id="text" placeholder="Enter message here" autocomplete="off">
+                </div>
+                <button type="submit" class="ui button">Submit</button>
+            </form>
+        </div>
+    </div>
+    <script>
+        var $memos = $('#memos');
+        var $intent="-1";
+        var $argv_={};
+        var $user="say2";
+        var $scenario="-1";
+        var $intent_history='1';
+
+
+        var update_memo = function () {
+            console.log('update');
+            $.getJSON('/chatbot/api/get_message', function (data) {
+                console.log(data);
+                var $dom = $('<div>').attr('id', "memo-" + data.id).addClass('item');
+                $dom.append($('<span>').text(data.text));
+                $dom.append($('<div>').css('float', 'right'));
+                $memos.append($dom);
+            })
+        };
+
+        var submit_memo = function (form) {
+            if(!form.text.value)
+                return false;
+            var $dom = $('<div>').attr('id', "sender").addClass('item').css({'padding-top':'10px'});
+            $dom.append($('<span>').text(form.text.value).css({'float':'right','font-size':'20px'}));
+            $dom.append($('<div>').css('float', 'right'));
+            $memos.append($dom);
+
+            $argv_["user"]=$user;
+            console.log($argv_);
+            console.log(JSON.stringify($argv_));
+            console.log($intent_history);
+            $.getJSON('/chatbot/api/get_message', {text: form.text.value,scenario: $scenario,intent_history:$intent_history,argv: JSON.stringify($argv_)}, function (data) {
+                var $dom = $('<div>').attr('id', "memo-" + data.id).addClass('item').css({'padding-top':'10px'});
+                $dom.append($('<span>').text(data.msg).css({'font-size':'20px'}));
+                $func=data.func;
+                $scenario=data.scenario;
+                $intent_history=data.intent_history;
+                $argv_=JSON.parse(data.argv);
+
+                $dom.append($('<div>').css({'float': 'right'}));
+                $memos.append($dom);
+
+                console.log("hihi");
+            });
+            form.text.value = '';
+            return false;
+        };
+
+        {#setInterval(update_memo, 3000)#}
+        {#update_memo();#}
+    </script>
+{% endmacro %}
