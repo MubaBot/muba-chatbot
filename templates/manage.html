@@ -2,14 +2,23 @@
 <html>
 {% extends 'layout.html' %}
 {% block title %}
-    <div class="ui four item menu">
-        {% for table in tables %}
+    <div class="ui five item menu">
+        {% for table in tables[:5] %}
             {#  <a class="active item">Editorials</a>#}
             {% if table==cur_table %}<a class="active item">{{ table }}</a>
             {% else %}  <a class="item" href="?table={{ table }}">{{ table }}{% endif %}</a>
             {#  <a class="item">Upcoming Events</a>#}
         {% endfor %}
     </div>
+    <div class="ui three item menu">
+    {% for table in tables[5:] %}
+            {#  <a class="active item">Editorials</a>#}
+            {% if table==cur_table %}<a class="active item">{{ table }}</a>
+            {% else %}  <a class="item" href="?table={{ table }}">{{ table }}{% endif %}</a>
+            {#  <a class="item">Upcoming Events</a>#}
+        {% endfor %}
+    </div>
+
 {% endblock %}
 {% block content %}
     <div class="row">
@@ -17,6 +26,7 @@
     </div>
     <div class="row">
         <table class="ui celled table">
+
             {% if cur_table=='muba_response_def' %}
                 <form class="form-inline" action="/chatbot/db_manage/item_add" method="post">
                 <input type="hidden" name="cur_table" value="{{ cur_table }}">
@@ -51,6 +61,75 @@
                         <td data-label="muba_response_intent_id">{{ rd[1] }}</td>
                         <td data-label="intent_name">{{ rd[3] }}({{ rd[4] }})</td>
                         <td data-label="sentence">{{ rd[2] }}<button onclick='location="/chatbot/db_manage/item_delete?table={{ cur_table }}&id={{ rd[0] }}"' style="float:right" class="ui button">Delete</button></td>
+
+                    </tr>
+                {% endfor %}
+
+                </tbody>
+                {% elif cur_table=='muba_response_intent' %}
+                <form class="form-inline" action="/chatbot/db_manage/item_add" method="post">
+                <input type="hidden" name="cur_table" value="{{ cur_table }}">
+
+                <div class="ui input focus">
+                    <input type="text" size=50 placeholder="intent_name" name="intent_name" value="">
+                    <input type="text" size=50 placeholder="func" name="func" value="">
+                </div>
+                <button type="submit" class="ui primary button">
+                    add
+                </button>
+                </form>
+
+                <thead>
+                <tr>
+
+                    <th class="collapsing">intent_id</th>
+                    <th>intent_name</th>
+                    <th class="collapsing">function</th>
+                    <th></th>
+
+                </tr>
+                </thead>
+                <tbody>
+
+                {% for rd in table_info %}
+                    <tr>
+                        <td data-label="muba_response_intent_id">{{ rd[0] }}</td>
+                        <td data-label="intent_name">{{ rd[1] }}</td>
+                        <td data-label="function">{{ rd[2] }}</td>
+                        <td><button onclick='location="/chatbot/db_manage/item_delete?table={{ cur_table }}&id={{ rd[0] }}"' style="float:right" class="ui button">Delete</button></td>
+
+                    </tr>
+                {% endfor %}
+
+                </tbody>
+                {% elif cur_table=='user_request_intent' %}
+                <form class="form-inline" action="/chatbot/db_manage/item_add" method="post">
+                <input type="hidden" name="cur_table" value="{{ cur_table }}">
+
+                <div class="ui input focus">
+                    <input type="text" size=50 placeholder="intent_name" name="intent_name" value="">
+                </div>
+                <button type="submit" class="ui primary button">
+                    add
+                </button>
+                </form>
+
+                <thead>
+                <tr>
+
+                    <th class="collapsing">intent_id</th>
+                    <th>intent_name</th>
+                    <th class="collapsing"></th>
+
+                </tr>
+                </thead>
+                <tbody>
+
+                {% for rd in table_info %}
+                    <tr>
+                        <td data-label="user_request_intent_id">{{ rd[0] }}</td>
+                        <td data-label="intent_name">{{ rd[1] }}</td>
+                        <td><button onclick='location="/chatbot/db_manage/item_delete?table={{ cur_table }}&id={{ rd[0] }}"' style="float:right" class="ui button">Delete</button></td>
 
                     </tr>
                 {% endfor %}
@@ -101,32 +180,16 @@
                 <button class="ui secondary button" onclick="add_scene_item();">
                     +
                 </button>
-                <form class="form-inline" action="/chatbot/db_manage/item_add" method="post">
-
-                <input type="hidden" name="cur_table" value="{{ cur_table }}">
-
-
-{#                <select name="intent_id" class="form-control ui search dropdown">#}
-
-{#                    {% for i,rd in enumerate(intent_list) %}#}
-{#                        {% if i%2==0 %}#}
-{#                        <option value={{ rd[0] }}>{{ rd[1] }}</option>#}
-{#                        {% else %}    #}
-{#                        {% endif %}#}
-{##}
-{#                    {% endfor %}#}
-{#                </select>#}
-
-
-                <button type="submit" class="ui primary button">
+                <button type="submit" class="ui primary button" onclick="submit_scenario();">
                     add
                 </button>
-                </form>
+{#                </form>#}
                 <thead>
                 <tr>
 
                     <th class="collapsing">scenario_id</th>
                     <th>scenario</th>
+                    <th class="collapsing"></th>
                     {#                <th>sentence</th>#}
 
                 </tr>
@@ -135,7 +198,7 @@
 
                 {% for rd in table_info %}
                     <tr>
-                        <td data-label="user_request_intent_id" class="collapsing">{{ rd[0] }}</td>
+                        <td data-label="scenario_id" class="collapsing">{{ rd[0] }}</td>
                         <td data-label="intent_name">
                             {% for scene in rd[2] %}
                                 {% if scene[0]=='muba' %}
@@ -146,6 +209,7 @@
 
 
                             {% endfor %}</td>
+                        <td><button onclick='location="/chatbot/db_manage/item_delete?table={{ cur_table }}&scenario_id={{ rd[0] }}"' style="float:right" class="ui button">Delete</button></td>
 
                     </tr>
                 {% endfor %}
@@ -156,6 +220,38 @@
     </div>
     <script>
     var cnt=0;
+    function post_to_url(path, params, method) {
+        method = method || "post"; // Set method to post by default, if not specified.
+
+        // The rest of this code assumes you are not using a library.
+        // It can be made less wordy if you use one.
+        var form = document.createElement("form");
+        form.setAttribute("method", method);
+        form.setAttribute("action", path);
+
+        for(var key in params) {
+            var hiddenField = document.createElement("input");
+            hiddenField.setAttribute("type", "hidden");
+            hiddenField.setAttribute("name", key);
+            hiddenField.setAttribute("value", params[key]);
+
+            form.appendChild(hiddenField);
+        }
+
+        document.body.appendChild(form);
+        form.submit();
+    }
+
+    function submit_scenario(){
+        var listobj=[];
+        for(var i=0; i<cnt; i++) {
+            var d=document.getElementById("scene_item"+i);
+            listobj.push(d.value);
+        }
+        {#window.location ='/chatbot/db_manage?table=scenario'#}
+        post_to_url('/chatbot/db_manage/scenario_add',{'scenario_list':JSON.stringify(listobj)});
+        cnt=0;
+    }
     function add_scene_item() {
         var myDiv = document.getElementById("scenario_item");
         var x=document.createElement("select");

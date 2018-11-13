@@ -64,9 +64,20 @@ def query_db(query, args=(), one=False):
 
 @app.route('/chatbot/db_manage')
 def db_manage():
-    tables = ['scenario', 'muba_response_def', 'user_request_def', 'response_func']
-    cur_table = request.args.get('table', default='muba_response_def', type=str)
+    tables = ['scenario', 'muba_response_def', 'user_request_def', 'muba_response_intent','user_request_intent']
+    tables+=['food','restaurant']
+    cur_table = request.args.get('table', default='scenario', type=str)
     intent_list=[]
+    if cur_table=='muba_response_intent':
+        response_intents=query_db('select * from muba_response_intent')
+        table_info=response_intents
+        response = render_template('manage.html', table_info=table_info, tables=tables, cur_table=cur_table)
+        return response
+    elif cur_table=='user_request_intent':
+        response_intents=query_db('select * from user_request_intent')
+        table_info=response_intents
+        response = render_template('manage.html', table_info=table_info, tables=tables, cur_table=cur_table)
+        return response
     if cur_table=='muba_response_def':
         response_def=query_db('select * from muba_response_def')
         for idx,rd in enumerate(response_def):
@@ -120,9 +131,6 @@ def db_manage():
         response = render_template('manage.html', table_info=table_info, tables=tables, cur_table=cur_table,user_intent=user_intent,muba_intent=muba_intent)
         return response
 
-
-
-
     response = render_template('manage.html',table_info=table_info,tables=tables,cur_table=cur_table,intent_list=intent_list)
     return response
 
@@ -131,27 +139,47 @@ def db_manage():
 @app.route('/chatbot/db_manage/item_add',methods=['POST'])
 def item_add():
     table_name=request.form['cur_table']
-    id=request.form.get('intent_id',type=int)
-    sentence=request.form.get('sentence',type=str)
-    if id and sentence:
-        if table_name=='muba_response_def':
+
+    if table_name=='muba_response_def':
+        id = request.form.get('intent_id', type=int)
+        sentence = request.form.get('sentence', type=str)
+        if id and sentence:
             query_execute('insert into muba_response_def (muba_response_intent_id,sentence) values (?, ?);',[id,sentence])
-        if table_name=='user_request_def':
+    elif table_name=='user_request_def':
+        id = request.form.get('intent_id', type=int)
+        sentence = request.form.get('sentence', type=str)
+        if id and sentence:
             query_execute('insert into user_request_def (user_request_intent_id,sentence) values (?, ?);',[id,sentence])
 
+
     return redirect('/chatbot/db_manage?table='+table_name)
+
+@app.route('/chatbot/db_manage/scenario_add',methods=['POST'])
+def scenario_add():
+    scenario_list=json.loads(request.form['scenario_list'])
+    scenario_='1,'+','.join(scenario_list)
+    query_execute('insert into scenario (scenario) values (?)',[scenario_])
+    return redirect('/chatbot/db_manage?table=scenario')
+
 
 @app.route('/chatbot/db_manage/item_delete')
 def item_delete():
     table_name=request.args.get('table')
-    id=request.args.get('id')
-    if table_name=='muba_response_def' and id:
-        print('hihi')
-        query_execute('delete from muba_response_def where sentence_id=(?)',[id])
-    elif table_name=='user_request_def' and id:
-        query_execute('delete from user_request_def where sentence_id=?', [id])
+
+    if table_name=='muba_response_def':
+        id = request.args.get('id')
+        if id:
+            query_execute('delete from muba_response_def where sentence_id=(?)',[id])
+    elif table_name=='user_request_def':
+        id = request.args.get('id')
+        if id:
+            query_execute('delete from user_request_def where sentence_id=?', [id])
+    elif table_name=='scenario':
+        id=request.args.get('scenario_id')
+        if id:
+            query_execute('delete from scenario where scenario_id=?',[id])
 
     return redirect('/chatbot/db_manage?table='+table_name)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=9999)
