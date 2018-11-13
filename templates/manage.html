@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+{% extends 'layout.html' %}
+{% block title %}
+    <div class="ui four item menu">
+        {% for table in tables %}
+            {#  <a class="active item">Editorials</a>#}
+            {% if table==cur_table %}<a class="active item">{{ table }}</a>
+            {% else %}  <a class="item" href="?table={{ table }}">{{ table }}{% endif %}</a>
+            {#  <a class="item">Upcoming Events</a>#}
+        {% endfor %}
+    </div>
+{% endblock %}
+{% block content %}
+    <div class="row">
+        <h1 class="ui huge header">{{ cur_table }}</h1>
+    </div>
+    <div class="row">
+        <table class="ui celled table">
+            {% if cur_table=='muba_response_def' %}
+                <form class="form-inline" action="/chatbot/db_manage/item_add" method="post">
+                <input type="hidden" name="cur_table" value="{{ cur_table }}">
+                <select name="intent_id" class="form-control ui search dropdown">
+
+                    {% for rd in intent_list %}
+                        <option value={{ rd[0] }}>{{ rd[1] }}</option>
+
+                    {% endfor %}
+                </select>
+                <div class="ui input focus">
+                    <input type="text" size=50 placeholder="sentence" name="sentence" value="">
+                </div>
+                <button type="submit" class="ui primary button">
+                    add
+                </button>
+                </form>
+
+                <thead>
+                <tr>
+
+                    <th class="collapsing">intent_id</th>
+                    <th class="collapsing">sentence_intent</th>
+                    <th>sentence</th>
+
+                </tr>
+                </thead>
+                <tbody>
+
+                {% for rd in table_info %}
+                    <tr>
+                        <td data-label="muba_response_intent_id">{{ rd[1] }}</td>
+                        <td data-label="intent_name">{{ rd[3] }}({{ rd[4] }})</td>
+                        <td data-label="sentence">{{ rd[2] }}<button onclick='location="/chatbot/db_manage/item_delete?table={{ cur_table }}&id={{ rd[0] }}"' style="float:right" class="ui button">Delete</button></td>
+
+                    </tr>
+                {% endfor %}
+
+                </tbody>
+            {% elif cur_table=='user_request_def' %}
+                <form class="form-inline" action="/chatbot/db_manage/item_add" method="post">
+                <input type="hidden" name="cur_table" value="{{ cur_table }}">
+                <select name="intent_id" class="form-control ui search dropdown">
+
+                    {% for rd in intent_list %}
+                        <option value={{ rd[0] }}>{{ rd[1] }}</option>
+
+                    {% endfor %}
+                </select>
+                <div class="ui input focus">
+                    <input type="text" size=50 placeholder="sentence" name="sentence" value="">
+                </div>
+                <button type="submit" class="ui primary button">
+                    add
+                </button>
+                </form>
+                <thead>
+                <tr>
+
+                    <th class="collapsing">intent_id</th>
+                    <th class="collapsing">sentence_intent</th>
+                    <th>sentence</th>
+
+                </tr>
+                </thead>
+                <tbody>
+
+                {% for rd in table_info %}
+                    <tr>
+                        <td data-label="user_request_intent_id">{{ rd[1] }}</td>
+                        <td data-label="intent_name">{{ rd[3] }}</td>
+                        <td data-label="sentence">{{ rd[2] }}<button onclick='location="/chatbot/db_manage/item_delete?table={{ cur_table }}&id={{ rd[0] }}"' style="float:right" class="ui button">Delete</button></td>
+
+                    </tr>
+                {% endfor %}
+
+                </tbody>
+            {% elif cur_table=='scenario' %}
+                <div id="scenario_item">
+{#                    <input type="text" size=50 placeholder="sentence" name="sentence" value="">#}
+                </div>
+                <button class="ui secondary button" onclick="add_scene_item();">
+                    +
+                </button>
+                <form class="form-inline" action="/chatbot/db_manage/item_add" method="post">
+
+                <input type="hidden" name="cur_table" value="{{ cur_table }}">
+
+
+{#                <select name="intent_id" class="form-control ui search dropdown">#}
+
+{#                    {% for i,rd in enumerate(intent_list) %}#}
+{#                        {% if i%2==0 %}#}
+{#                        <option value={{ rd[0] }}>{{ rd[1] }}</option>#}
+{#                        {% else %}    #}
+{#                        {% endif %}#}
+{##}
+{#                    {% endfor %}#}
+{#                </select>#}
+
+
+                <button type="submit" class="ui primary button">
+                    add
+                </button>
+                </form>
+                <thead>
+                <tr>
+
+                    <th class="collapsing">scenario_id</th>
+                    <th>scenario</th>
+                    {#                <th>sentence</th>#}
+
+                </tr>
+                </thead>
+                <tbody>
+
+                {% for rd in table_info %}
+                    <tr>
+                        <td data-label="user_request_intent_id" class="collapsing">{{ rd[0] }}</td>
+                        <td data-label="intent_name">
+                            {% for scene in rd[2] %}
+                                {% if scene[0]=='muba' %}
+                                    <span style="color:blue" data-tooltip="{% for ex in scene[2]%}{{ ex[0] }}{% endfor %}" >muba : {{ scene[1] }}</span><br>
+                                {% else %}
+                                    <span style="color:black"data-tooltip="{% for ex in scene[2]%}{{ ex[0]+'/  ' }}{% endfor %}" >user : {{ scene[1] }}</span><br>
+                                {% endif %}
+
+
+                            {% endfor %}</td>
+
+                    </tr>
+                {% endfor %}
+
+                </tbody>
+            {% endif %}
+        </table>
+    </div>
+    <script>
+    var cnt=0;
+    function add_scene_item() {
+        var myDiv = document.getElementById("scenario_item");
+        var x=document.createElement("select");
+        x.id = "scene_item"+cnt;
+        x.className ="form-control ui search dropdown";
+        myDiv.appendChild(x);
+
+        if(cnt%2==0){
+            {% for intent in user_intent %}
+                var option = document.createElement("option");
+                option.text = "{{ intent[1] }}";
+                option.value={{ intent[0] }};
+                x.appendChild(option);
+            {% endfor %}
+        }
+        else {
+            {% for intent in muba_intent %}
+                var option = document.createElement("option");
+                option.text = "{{ intent[1] }}";
+                option.value={{ intent[0] }};
+                option.id="item"+cnt;
+
+                x.appendChild(option);
+            {% endfor %}
+        }
+
+        cnt+=1;
+
+    };
+    </script>
+{% endblock %}
+
+
+</html>

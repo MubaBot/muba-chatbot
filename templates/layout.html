@@ -1,4 +1,6 @@
 {% extends 'base.html' %}
+{% block head %}
+{% endblock %}
 {% block body %}
     <div class="ui inverted huge borderless fixed fluid menu">
         <a class="header item">muba chatbot demo</a>
@@ -16,18 +18,18 @@
             <div class="column" id="sidebar">
                 <div class="ui secondary vertical fluid menu">
                     {% macro link(to, text, danger=False) %}
-{#                        <a class="{% if text.lower() == active.lower() %}active {% endif %}item" href="{{ to }}">#}
-{#                            {% if danger %}#}
-{#                                <i class="exclamation triangle icon"></i>#}
-{#                            {% endif %}#}
-{##}
-{#                            {{ text }}#}
-{#                        </a>#}
+                        <a class=item href="{{ to }}">
+                            {% if danger %}
+                                <i class="exclamation triangle icon"></i>
+                            {% endif %}
+
+                            {{ text }}
+                        </a>
                     {% endmacro %}
-                    {{ link('/manager', 'Overview') }}
-                    {{ link("/manager/add", 'Add exploit') }}
+                    {{ link('/chatbot/db_manage', 'db_manager') }}
+                    {{ link("/chatbot/chatbot", 'chatbot test') }}
+
                     <div class="ui divider"></div>
-                    {{ link("/manager/_config", 'Configuration', True) }}
                 </div>
             </div>
             <div class="column" id="content">
@@ -44,10 +46,9 @@
                         {% endif %}
                     {% endwith %}
                     <div class="row">
-                        <h1 class="ui huge header">
                             {% block title %}
                             {% endblock %}
-                        </h1>
+
                     </div>
                     <div class="ui divider"></div>
                     {% block content %}
