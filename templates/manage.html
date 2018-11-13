@@ -135,6 +135,78 @@
                 {% endfor %}
 
                 </tbody>
+                {% elif cur_table=='food' %}
+                <form class="form-inline" action="/chatbot/db_manage/item_add" method="post">
+                <input type="hidden" name="cur_table" value="{{ cur_table }}">
+
+                <div class="ui input focus">
+                    <input type="text" size=50 placeholder="food_name" name="food_name" value="">
+                </div>
+                <button type="submit" class="ui primary button">
+                    add
+                </button>
+                </form>
+
+                <thead>
+                <tr>
+
+                    <th class="collapsing">food_id</th>
+                    <th>food_name</th>
+                    <th class="collapsing"></th>
+
+                </tr>
+                </thead>
+                <tbody>
+
+                {% for rd in table_info %}
+                    <tr>
+                        <td data-label="food_id">{{ rd[0] }}</td>
+                        <td data-label="food_name">{{ rd[1] }}</td>
+                        <td><button onclick='location="/chatbot/db_manage/item_delete?table={{ cur_table }}&id={{ rd[0] }}"' style="float:right" class="ui button">Delete</button></td>
+
+                    </tr>
+                {% endfor %}
+
+                </tbody>
+                {% elif cur_table=='restaurant' %}
+{#                <form class="form-inline" action="/chatbot/db_manage/item_add" method="post">#}
+{#                <input type="hidden" name="cur_table" value="{{ cur_table }}">#}
+{##}
+{#                <div class="ui input focus">#}
+{#                    <input type="text" size=50 placeholder="restaurant_name" name="restaurant_name" value="">#}
+{#                    <input type="text" size=50 placeholder="franchise" name="franchise_loc" value="">#}
+{#                    <input type="text" size=50 placeholder="menu" name="menu" value="">#}
+{#                </div>#}
+{#                <button type="submit" class="ui primary button">#}
+{#                    add#}
+{#                </button>#}
+{#                </form>#}
+
+                <thead>
+                <tr>
+
+                    <th class="collapsing">restaurant_id</th>
+                    <th>restaurant_name</th>
+                    <th>franchise</th>
+                    <th>menu</th>
+                    <th class="collapsing"></th>
+
+                </tr>
+                </thead>
+                <tbody>
+
+                {% for rd in table_info %}
+                    <tr>
+                        <td data-label="restaurant_id">{{ rd[0] }}</td>
+                        <td data-label="restaurant_name">{{ rd[1] }}</td>
+                        <td data-label="franchise">{{ rd[2] }}</td>
+                        <td data-label="menu">{{ rd[3] }}</td>
+                        <td><button onclick='location="/chatbot/db_manage/item_delete?table={{ cur_table }}&id={{ rd[0] }}"' style="float:right" class="ui button">Delete</button></td>
+
+                    </tr>
+                {% endfor %}
+
+                </tbody>
             {% elif cur_table=='user_request_def' %}
                 <form class="form-inline" action="/chatbot/db_manage/item_add" method="post">
                 <input type="hidden" name="cur_table" value="{{ cur_table }}">

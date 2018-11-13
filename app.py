@@ -78,7 +78,17 @@ def db_manage():
         table_info=response_intents
         response = render_template('manage.html', table_info=table_info, tables=tables, cur_table=cur_table)
         return response
-    if cur_table=='muba_response_def':
+    elif cur_table=='food':
+        food_info=query_db('select * from food')
+        table_info = food_info
+        response = render_template('manage.html', table_info=table_info, tables=tables, cur_table=cur_table)
+        return response
+    elif cur_table=='restaurant':
+        rest_info=query_db('select * from restaurant')
+        table_info = rest_info
+        response = render_template('manage.html', table_info=table_info, tables=tables, cur_table=cur_table)
+        return response
+    elif cur_table=='muba_response_def':
         response_def=query_db('select * from muba_response_def')
         for idx,rd in enumerate(response_def):
 
@@ -150,7 +160,20 @@ def item_add():
         sentence = request.form.get('sentence', type=str)
         if id and sentence:
             query_execute('insert into user_request_def (user_request_intent_id,sentence) values (?, ?);',[id,sentence])
-
+    elif table_name=='food':
+        food_name = request.form.get('food_name', type=str)
+        if food_name:
+            query_execute('insert into food (name) values (?);',
+                          [food_name])
+    elif table_name=='muba_response_intent':
+        intent_name=request.form.get('intent_name',type=str)
+        func=request.form.get('func',type=str)
+        if intent_name and func:
+            query_execute('insert into muba_response_intent (intent_name,func) values(?,?);',[intent_name,func])
+    elif table_name == 'user_request_intent':
+        intent_name = request.form.get('intent_name', type=str)
+        if intent_name:
+            query_execute('insert into user_request_intent (intent_name) values(?,?);', [intent_name])
 
     return redirect('/chatbot/db_manage?table='+table_name)
 
@@ -178,6 +201,18 @@ def item_delete():
         id=request.args.get('scenario_id')
         if id:
             query_execute('delete from scenario where scenario_id=?',[id])
+    elif table_name=='food':
+        id = request.args.get('id')
+        if id:
+            query_execute('delete from food where food_id=?', [id])
+    elif table_name=='user_request_intent':
+        id = request.args.get('id')
+        if id:
+            query_execute('delete from user_request_intent where user_request_intent_id=?', [id])
+    elif table_name=='muba_response_intent':
+        id = request.args.get('id')
+        if id:
+            query_execute('delete from muba_response_intent where muba_response_intent_id=?', [id])
 
     return redirect('/chatbot/db_manage?table='+table_name)
 
