@@ -216,5 +216,17 @@ def item_delete():
 
     return redirect('/chatbot/db_manage?table='+table_name)
 
+@app.route('/chatbot/db_manage/add_restaurant',methods=['POST'])
+def add_restaurant():
+    try:
+
+        restaurant=request.form.get('restaurant_name')
+        xx=request.form.get('menu')
+        menu=','.join(json.loads(xx))
+        query_execute('insert into restaurant (name,menu) values (?, ?);', [restaurant, menu])
+        return 'ok'
+    except:
+        return 'error'
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
