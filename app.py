@@ -228,15 +228,16 @@ def item_delete():
 def add_restaurant():
     try:
         restaurant=request.form.get('restaurant_name')
+        shop_id = request.form.get('shop_id')
         # print(restaurant)
         xx=request.form.get('menu')
         menu=','.join(json.loads(xx))
-        res_ch = query_db('select * from restaurant where name=(?)',[restaurant])
+        res_ch = query_db('select * from restaurant where name=(?) and id =(?)',[restaurant,shop_id])
 
         if not res_ch:
-            query_execute('insert into restaurant (name,menu) values (?, ?);', [restaurant, menu])
+            query_execute('insert into restaurant (id,name,menu) values (?,?, ?);', [shop_id,restaurant, menu])
         else:
-            query_execute('update restaurant set menu=(?) where name=(?)',[menu,restaurant])
+            query_execute('update restaurant set menu=(?) where id=(?)',[menu,shop_id])
         return 'ok'
     except Exception as ex:
         print(ex)
@@ -245,10 +246,11 @@ def add_restaurant():
 @app.route('/chatbot/db_manage/change_restaurant_name',methods=['PUT'])
 def change_restaurant_name():
     try:
+        shop_id = request.form.get('shop_id')
         menu = ','.join(json.loads(request.form.get('menu')))
         old = request.form.get('restaurant_name')
         new = request.form.get('new_restaurant_name')
-        query_execute('update restaurant set menu=(?),name=(?) where name=(?)', [menu, new,old])
+        query_execute('update restaurant set menu=(?),name=(?) where id=(?) and name=(?)', [menu, new,shop_id,old])
         return 'ok'
     except Exception as ex:
         print(ex)
