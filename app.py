@@ -47,13 +47,13 @@ def get_message():
 
     argv=request.args.get('argv')
     argv = json.loads(argv)
-    print('hi'+msg_txt,scenario,intent_history,argv)
+    # print('hi'+msg_txt,scenario,intent_history,argv)
     muba_msg, func, cur_scenario, intent_history,argv=muba_response(msg_txt,int(scenario),intent_history,argv)
     argv=json.dumps(argv)
     #print("@"*100)
     #print(res_txt)
     ret=json.dumps({'msg':muba_msg,'func':func,'argv':argv,'scenario':cur_scenario,'intent_history':','.join(intent_history)})
-    print(ret)
+    # print(ret)
     return ret
 
 def query_db(query, args=(), one=False):
@@ -185,6 +185,8 @@ def scenario_add():
     return redirect('/chatbot/db_manage?table=scenario')
 
 
+
+
 @app.route('/chatbot/db_manage/item_delete')
 def item_delete():
     table_name=request.args.get('table')
@@ -219,17 +221,40 @@ def item_delete():
             query_execute('delete from restaurant where id=?', [id])
     return redirect('/chatbot/db_manage?table='+table_name)
 
+
+
 @app.route('/chatbot/db_manage/add_restaurant',methods=['POST'])
 def add_restaurant():
     try:
-
         restaurant=request.form.get('restaurant_name')
+        # print(restaurant)
         xx=request.form.get('menu')
         menu=','.join(json.loads(xx))
-        query_execute('insert into restaurant (name,menu) values (?, ?);', [restaurant, menu])
+        res_ch = query_db('select * from restaurant where name=(?)',[restaurant])
+
+        if not res_ch:
+            query_execute('insert into restaurant (name,menu) values (?, ?);', [restaurant, menu])
+        else:
+            query_execute('update restaurant set menu=(?) where name=(?)',[menu,restaurant])
         return 'ok'
-    except:
+    except Exception as ex:
+        print(ex)
         return 'error'
 
+@app.route('/chatbot/db_manage/change_restaurant_name',methods=['PUT'])
+def change_restaurant_name():
+    try:
+        menu = ','.join(json.loads(request.form.get('menu')))
+        old = request.form.get('restaurant_name')
+        new = request.form.get('new_restaurant_name')
+        query_execute('update restaurant set menu=(?),name=(?) where name=(?)', [menu, new,old])
+        return 'ok'
+    except Exception as ex:
+        print(ex)
+        return 'error'
+
+
+
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=9999)
