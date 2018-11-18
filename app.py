@@ -84,9 +84,10 @@ def db_manage():
         response = render_template('manage.html', table_info=table_info, tables=tables, cur_table=cur_table)
         return response
     elif cur_table=='restaurant':
-        rest_info=query_db('select * from restaurant')
+        page = request.args.get('page', default=1, type=int)
+        rest_info=query_db('select * from restaurant LIMIT ? OFFSET ?;',[50,50*(page-1)])
         table_info = rest_info
-        response = render_template('manage.html', table_info=table_info, tables=tables, cur_table=cur_table)
+        response = render_template('manage.html', table_info=table_info, tables=tables, cur_table=cur_table,page=page)
         return response
     elif cur_table=='muba_response_def':
         response_def=query_db('select * from muba_response_def')
@@ -252,6 +253,11 @@ def change_restaurant_name():
     except Exception as ex:
         print(ex)
         return 'error'
+
+
+
+
+
 
 
 

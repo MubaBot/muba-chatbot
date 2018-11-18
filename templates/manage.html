@@ -205,6 +205,46 @@
 
                     </tr>
                 {% endfor %}
+                <div class="ui pagination menu">
+                    {% if page>2 %}
+                    {% for i in range(page-2,page+3) %}
+                    {% if page==i %}
+                    <a class="active item" href="/chatbot/db_manage?table={{cur_table}}&page={{page}}">
+                        {{page}}
+                    </a>
+                    {% else %}
+                    <a class="item" href="/chatbot/db_manage?table={{cur_table}}&page={{i}}">
+                        {{i}}
+                    </a>
+                    {% endif %}
+                    {% endfor %}
+                    {% elif page==1 %}
+                    {% for i in range(page,page+5) %}
+                    {% if page==i %}
+                    <a class="active item" href="/chatbot/db_manage?table={{cur_table}}&page={{page}}">
+                        {{page}}
+                    </a>
+                    {% else %}
+                    <a class="item" href="/chatbot/db_manage?table={{cur_table}}&page={{i}}">
+                        {{i}}
+                    </a>
+                    {% endif %}
+                    {% endfor %}
+                    {% elif page==2 %}
+                    {% for i in range(page-1,page+4) %}
+                    {% if page==i %}
+                    <a class="active item" href="/chatbot/db_manage?table={{cur_table}}&page={{page}}">
+                        {{page}}
+                    </a>
+                    {% else %}
+                    <a class="item" href="/chatbot/db_manage?table={{cur_table}}&page={{i}}">
+                        {{i}}
+                    </a>
+                    {% endif %}
+                    {% endfor %}
+                    {% endif %}
+
+                </div>
 
                 </tbody>
             {% elif cur_table=='user_request_def' %}
