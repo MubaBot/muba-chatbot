@@ -232,7 +232,7 @@ def add_restaurant():
         # print(restaurant)
         xx=request.form.get('menu')
         menu=','.join(json.loads(xx))
-        res_ch = query_db('select * from restaurant id =(?)',[shop_id])
+        res_ch = query_db('select * from restaurant where id =(?)',[shop_id])
 
         if not res_ch:
             query_execute('insert into restaurant (id,name,menu) values (?,?, ?);', [shop_id,restaurant, menu])
