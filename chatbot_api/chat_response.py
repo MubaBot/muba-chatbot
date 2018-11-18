@@ -2,10 +2,35 @@
 # from .response_def import *
 
 
-from chatbot_api.Markov_response.test import Markov_response
+# from chatbot_api.Markov_response.test import Markov_response
 from chatbot_api.scenario_base.replace_sentence import *
 from chatbot_api.scenario_base.find_intent import *
-MR = Markov_response()
+import sqlite3
+from random import *
+
+# MR = Markov_response()
+
+def query_db(query, args=(), one=False):
+    conn = sqlite3.connect('chatbotdb.db')
+    cur = conn.cursor()
+    cur.execute(query,args)
+    rv = cur.fetchall()
+    return (rv[0] if rv else None) if one else rv
+
+def static_response(msg):
+    res = query_db("select * from static_response where req=?",[msg])
+    if res:
+        res=res[randint(0,len(res)-1)]
+        return res[2]
+    else:
+        res=query_db("select * from static_response WHERE instr(req, ?) > 0;",[msg])
+
+        if res:
+            res = res[randint(0, len(res) - 1)]
+            return res[2]
+        else:
+            return "잘 모르는 말이에요"
+
 
 
 def muba_response(msg, cur_scenario, priv_intent,argv):
@@ -77,7 +102,7 @@ def muba_response(msg, cur_scenario, priv_intent,argv):
                         priv_intent.append(muba_intent)
                         return muba_msg, func, cur_scenario, priv_intent,argv
                 if not intent:
-                    muba_msg=MR.make_reply(msg)
+                    muba_msg=static_response(msg)#MR.make_reply(msg)
                     func=''
                     return muba_msg,func,cur_scenario,priv_intent,argv
         else:
@@ -85,7 +110,8 @@ def muba_response(msg, cur_scenario, priv_intent,argv):
             intent,scenario=find_intent_soft(msg,priv_intent)
 
             if not intent:
-                muba_msg = MR.make_reply(msg)
+                # muba_msg = MR.make_reply(msg)
+                muba_msg = static_response(msg)
                 func = ''
                 return muba_msg, func, cur_scenario, priv_intent,argv
             else:

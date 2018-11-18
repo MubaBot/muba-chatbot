@@ -135,6 +135,7 @@
                 {% endfor %}
 
                 </tbody>
+
                 {% elif cur_table=='food' %}
                 <form class="form-inline" action="/chatbot/db_manage/item_add" method="post">
                 <input type="hidden" name="cur_table" value="{{ cur_table }}">
@@ -168,6 +169,44 @@
                 {% endfor %}
 
                 </tbody>
+
+                {% elif cur_table=='static_response' %}
+                <form class="form-inline" action="/chatbot/db_manage/add_static_conv" method="post">
+                <input type="hidden" name="cur_table" value="{{ cur_table }}">
+
+                <div class="ui input focus">
+                    <input type="text" size=50 placeholder="request" name="req" value="">
+                    <input type="text" size=50 placeholder="response" name="res" value="">
+                </div>
+                <button type="submit" class="ui primary button">
+                    add
+                </button>
+                </form>
+
+                <thead>
+                <tr>
+
+                    <th class="collapsing">id</th>
+                    <th>request</th>
+                    <th>response</th>
+                    <th class="collapsing"></th>
+
+                </tr>
+                </thead>
+                <tbody>
+
+                {% for rd in table_info %}
+                    <tr>
+                        <td data-label="id">{{ rd[0] }}</td>
+                        <td data-label="request">{{ rd[1] }}</td>
+                        <td data-label="response">{{ rd[2] }}</td>
+                        <td><button onclick='location="/chatbot/db_manage/item_delete?table={{ cur_table }}&id={{ rd[0] }}"' style="float:right" class="ui button">Delete</button></td>
+
+                    </tr>
+                {% endfor %}
+
+                </tbody>
+
                 {% elif cur_table=='restaurant' %}
 {#                <form class="form-inline" action="/chatbot/db_manage/item_add" method="post">#}
 {#                <input type="hidden" name="cur_table" value="{{ cur_table }}">#}

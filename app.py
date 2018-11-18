@@ -64,86 +64,96 @@ def query_db(query, args=(), one=False):
 
 @app.route('/chatbot/db_manage')
 def db_manage():
-    tables = ['scenario', 'muba_response_def', 'user_request_def', 'muba_response_intent','user_request_intent']
-    tables+=['food','restaurant']
-    cur_table = request.args.get('table', default='scenario', type=str)
-    intent_list=[]
-    if cur_table=='muba_response_intent':
-        response_intents=query_db('select * from muba_response_intent')
-        table_info=response_intents
-        response = render_template('manage.html', table_info=table_info, tables=tables, cur_table=cur_table)
-        return response
-    elif cur_table=='user_request_intent':
-        response_intents=query_db('select * from user_request_intent')
-        table_info=response_intents
-        response = render_template('manage.html', table_info=table_info, tables=tables, cur_table=cur_table)
-        return response
-    elif cur_table=='food':
-        food_info=query_db('select * from food')
-        table_info = food_info
-        response = render_template('manage.html', table_info=table_info, tables=tables, cur_table=cur_table)
-        return response
-    elif cur_table=='restaurant':
-        page = request.args.get('page', default=1, type=int)
-        rest_info=query_db('select * from restaurant LIMIT ? OFFSET ?;',[50,50*(page-1)])
-        table_info = rest_info
-        response = render_template('manage.html', table_info=table_info, tables=tables, cur_table=cur_table,page=page)
-        return response
-    elif cur_table=='muba_response_def':
-        response_def=query_db('select * from muba_response_def')
-        for idx,rd in enumerate(response_def):
+    try:
+        tables = ['scenario', 'muba_response_def', 'user_request_def', 'muba_response_intent','user_request_intent']
+        tables+=['food','restaurant','static_response']
+        cur_table = request.args.get('table', default='scenario', type=str)
+        intent_list=[]
+        if cur_table=='muba_response_intent':
+            response_intents=query_db('select * from muba_response_intent')
+            table_info=response_intents
+            response = render_template('manage.html', table_info=table_info, tables=tables, cur_table=cur_table)
+            return response
+        elif cur_table=='user_request_intent':
+            response_intents=query_db('select * from user_request_intent')
+            table_info=response_intents
+            response = render_template('manage.html', table_info=table_info, tables=tables, cur_table=cur_table)
+            return response
+        elif cur_table=='food':
+            food_info=query_db('select * from food')
+            table_info = food_info
+            response = render_template('manage.html', table_info=table_info, tables=tables, cur_table=cur_table)
+            return response
+        elif cur_table=='static_response':
+            info = query_db('select * from static_response')
+            table_info=info
+            response = render_template('manage.html', table_info=table_info, tables=tables, cur_table=cur_table)
+            return response
 
-            x=query_db('select intent_name,func from muba_response_intent where muba_response_intent_id  = ?',[rd[1]],one=True)
-            # print(x)
-            if len(x)==2:
-                response_def[idx]=rd+(x[0],x[1],)
-        table_info=response_def
-        intent_list=query_db('select muba_response_intent_id,intent_name from muba_response_intent')
-    if cur_table=='user_request_def':
-        request_def=query_db('select * from user_request_def')
-        for idx,rd in enumerate(request_def):
+        elif cur_table=='restaurant':
+            page = request.args.get('page', default=1, type=int)
+            rest_info=query_db('select * from restaurant LIMIT ? OFFSET ?;',[50,50*(page-1)])
+            table_info = rest_info
+            response = render_template('manage.html', table_info=table_info, tables=tables, cur_table=cur_table,page=page)
+            return response
+        elif cur_table=='muba_response_def':
+            response_def=query_db('select * from muba_response_def')
+            for idx,rd in enumerate(response_def):
 
-            x=query_db('select intent_name from user_request_intent where user_request_intent_id  = ?',[rd[1]],one=True)
-            # print(x)
-            if len(x)==1:
-                request_def[idx]=rd+(x[0],)
-        table_info=request_def
-        intent_list = query_db('select user_request_intent_id,intent_name from user_request_intent')
-    if cur_table=='scenario':
-        user_intent = query_db('select user_request_intent_id,intent_name from user_request_intent')
-        muba_intent = query_db('select muba_response_intent_id,intent_name from muba_response_intent')
-        scenario=query_db('select * from scenario')
-        idx=0
-        for id,scene in scenario:
-            # print(scene)
-            scene=scene.split(',')[1:]
-            intent_str_list=[]
+                x=query_db('select intent_name,func from muba_response_intent where muba_response_intent_id  = ?',[rd[1]],one=True)
+                # print(x)
+                if len(x)==2:
+                    response_def[idx]=rd+(x[0],x[1],)
+            table_info=response_def
+            intent_list=query_db('select muba_response_intent_id,intent_name from muba_response_intent')
+        if cur_table=='user_request_def':
+            request_def=query_db('select * from user_request_def')
+            for idx,rd in enumerate(request_def):
+
+                x=query_db('select intent_name from user_request_intent where user_request_intent_id  = ?',[rd[1]],one=True)
+                # print(x)
+                if len(x)==1:
+                    request_def[idx]=rd+(x[0],)
+            table_info=request_def
+            intent_list = query_db('select user_request_intent_id,intent_name from user_request_intent')
+        if cur_table=='scenario':
+            user_intent = query_db('select user_request_intent_id,intent_name from user_request_intent')
+            muba_intent = query_db('select muba_response_intent_id,intent_name from muba_response_intent')
+            scenario=query_db('select * from scenario')
+            idx=0
+            for id,scene in scenario:
+                # print(scene)
+                scene=scene.split(',')[1:]
+                intent_str_list=[]
 
 
-            for i,s in enumerate(scene):
-                if i%2==1:
-                    x=query_db('select intent_name from muba_response_intent where muba_response_intent_id=?',[s],one=True)
-                    if x:
-                        y=query_db('select sentence from muba_response_def where muba_response_intent_id=?',[s])
+                for i,s in enumerate(scene):
+                    if i%2==1:
+                        x=query_db('select intent_name from muba_response_intent where muba_response_intent_id=?',[s],one=True)
+                        if x:
+                            y=query_db('select sentence from muba_response_def where muba_response_intent_id=?',[s])
 
-                        intent_str_list.append(('muba',x[0],y))
-                else:
-                    x = query_db('select intent_name from user_request_intent where user_request_intent_id=?', [s],
-                                 one=True)
-                    if x:
+                            intent_str_list.append(('muba',x[0],y))
+                    else:
+                        x = query_db('select intent_name from user_request_intent where user_request_intent_id=?', [s],
+                                     one=True)
+                        if x:
 
-                        y = query_db('select sentence from user_request_def where user_request_intent_id=?', [s])
+                            y = query_db('select sentence from user_request_def where user_request_intent_id=?', [s])
 
-                        intent_str_list.append(('user', x[0],y))
-            scenario[idx]=scenario[idx]+(intent_str_list,)
-            idx+=1
-        print(scenario)
-        table_info=scenario
-        response = render_template('manage.html', table_info=table_info, tables=tables, cur_table=cur_table,user_intent=user_intent,muba_intent=muba_intent)
-        return response
+                            intent_str_list.append(('user', x[0],y))
+                scenario[idx]=scenario[idx]+(intent_str_list,)
+                idx+=1
+            print(scenario)
+            table_info=scenario
+            response = render_template('manage.html', table_info=table_info, tables=tables, cur_table=cur_table,user_intent=user_intent,muba_intent=muba_intent)
+            return response
+        else:
+            return 'unknown table'
+    except Exception as ex:
+        print(ex)
+        return 'error'
 
-    response = render_template('manage.html',table_info=table_info,tables=tables,cur_table=cur_table,intent_list=intent_list)
-    return response
 
 
 
@@ -220,6 +230,10 @@ def item_delete():
         id = request.args.get('id')
         if id:
             query_execute('delete from restaurant where id=?', [id])
+    elif table_name=='static_response':
+        id = request.args.get('id')
+        if id:
+            query_execute('delete from static_response where id=?', [id])
     return redirect('/chatbot/db_manage?table='+table_name)
 
 
@@ -228,11 +242,15 @@ def item_delete():
 def add_restaurant():
     try:
         restaurant=request.form.get('restaurant_name')
+
         shop_id = request.form.get('shop_id')
+
         # print(restaurant)
         xx=request.form.get('menu')
         menu=','.join(json.loads(xx))
-        res_ch = query_db('select * from restaurant where id =(?)',[shop_id])
+
+        res_ch = query_db('select * from restaurant where id=(?)', [shop_id])
+        # res_ch=False
 
         if not res_ch:
             query_execute('insert into restaurant (id,name,menu) values (?,?, ?);', [shop_id,restaurant, menu])
@@ -243,22 +261,27 @@ def add_restaurant():
         print(ex)
         return 'error'
 
-# @app.route('/chatbot/db_manage/change_restaurant_name',methods=['PUT'])
-# def change_restaurant_name():
-#     try:
-#         shop_id = request.form.get('shop_id')
-#         menu = ','.join(json.loads(request.form.get('menu')))
-#         name = request.form.get('restaurant_name')
-# 
-#         query_execute('update restaurant set menu=(?),name=(?) where id=(?)', [menu, new,shop_id,old])
-#         return 'ok'
-#     except Exception as ex:
-#         print(ex)
-#         return 'error'
 
+@app.route('/chatbot/db_manage/add_static_conv',methods=['POST'])
+def add_static_conv():
+    try:
+        req=request.form.get('req')
 
+        res = request.form.get('res')
+        if req and res:
+            query_execute('insert into static_response (req,res) values (?,?);', [req, res])
 
-
+        # res_ch = query_db('select * from static_response where req=(?)', [req])
+        # # res_ch=False
+        #
+        # if not res_ch:
+        #     query_execute('insert into static_response (req,res) values (?,?);', [req,res])
+        # else:
+        #     query_execute('update static_response set req=(?),res=(?) where req=(?)',[req,res,req])
+        return 'ok'
+    except Exception as ex:
+        print(ex)
+        return 'error'
 
 
 
