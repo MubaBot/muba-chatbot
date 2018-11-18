@@ -213,7 +213,10 @@ def item_delete():
         id = request.args.get('id')
         if id:
             query_execute('delete from muba_response_intent where muba_response_intent_id=?', [id])
-
+    elif table_name=='restaurant':
+        id = request.args.get('id')
+        if id:
+            query_execute('delete from restaurant where id=?', [id])
     return redirect('/chatbot/db_manage?table='+table_name)
 
 @app.route('/chatbot/db_manage/add_restaurant',methods=['POST'])
