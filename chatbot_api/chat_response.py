@@ -92,7 +92,7 @@ def muba_response(msg, cur_scenario, priv_intent,argv):
                     muba_msg = static_response(msg)  # MR.make_reply(msg)
                     func = ''
                     cur_scenario=-1
-                    
+
                     return muba_msg, func, cur_scenario, priv_intent, argv
                 return muba_response(orig_msg,-2,['1',],new_argv)#muba_msg, func, cur_scenario, priv_intent
 

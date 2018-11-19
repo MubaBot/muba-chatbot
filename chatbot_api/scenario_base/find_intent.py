@@ -60,6 +60,8 @@ def find_intent_soft_base_scenario(msg,scenario_id,loc):
         conn.close()
         return ex
     print(this_scenario)
+    if (len(this_scenario)-1)<loc:
+        return False
     predict_intent=this_scenario[loc]
     sql="select keyword from user_request_intent_keyword where user_request_intent_id=?"
     cur.execute(sql,[predict_intent])
