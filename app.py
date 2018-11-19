@@ -48,6 +48,8 @@ def get_message():
     argv=request.args.get('argv')
     argv = json.loads(argv)
     # print('hi'+msg_txt,scenario,intent_history,argv)
+    # print('asdfasdf')
+    # print(muba_response(msg_txt,int(scenario),intent_history,argv))
     muba_msg, func, cur_scenario, intent_history,argv=muba_response(msg_txt,int(scenario),intent_history,argv)
     argv=json.dumps(argv)
     #print("@"*100)
@@ -191,7 +193,7 @@ def item_add():
     elif table_name == 'user_request_intent':
         intent_name = request.form.get('intent_name', type=str)
         if intent_name:
-            query_execute('insert into user_request_intent (intent_name) values(?,?);', [intent_name])
+            query_execute('insert into user_request_intent (intent_name) values(?);', [intent_name])
 
     return redirect('/chatbot/db_manage?table='+table_name)
 
