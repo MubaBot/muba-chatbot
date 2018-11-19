@@ -39,7 +39,9 @@ def muba_response(msg, cur_scenario, priv_intent,argv):
     if 'restaurant' in argv.keys():
         restaurant=argv['restaurant']
     else:
+
         msg,restaurant=replace_restaurant(msg)
+        print(msg,restaurant)
 
     if restaurant:
         if 'restaurant' in argv.keys():

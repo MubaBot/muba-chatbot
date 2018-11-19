@@ -24,8 +24,8 @@ def replace_restaurant(msg):
             if rest in msg:
                 msg=msg.replace(rest,'[음식점{}]'.format(str(idx)))
                 idx+=1
-                loc=get_cur_loc()
-                find_rest.append((rest,loc))
+                # loc=get_cur_loc()
+                find_rest.append((rest))
 
         else:
             loc_list=loc.split(',')
@@ -44,8 +44,8 @@ def replace_restaurant(msg):
                 if rest in msg:
                     msg=msg.replace(rest, '[음식점{}]'.format(str(idx)))
                     idx+=1
-                    loc = get_cur_loc()
-                    find_rest.append("%s %s점" %(rest,loc))
+                    # loc = get_cur_loc()
+                    find_rest.append("%s" %(rest))
     conn.close()
     return msg,find_rest
 
