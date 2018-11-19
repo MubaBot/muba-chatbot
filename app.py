@@ -106,7 +106,10 @@ def db_manage():
                     response_def[idx]=rd+(x[0],x[1],)
             table_info=response_def
             intent_list=query_db('select muba_response_intent_id,intent_name from muba_response_intent')
-        if cur_table=='user_request_def':
+            response = render_template('manage.html', table_info=table_info, tables=tables, cur_table=cur_table,
+                                       intent_list=intent_list)
+            return response
+        elif cur_table=='user_request_def':
             request_def=query_db('select * from user_request_def')
             for idx,rd in enumerate(request_def):
 
@@ -116,7 +119,11 @@ def db_manage():
                     request_def[idx]=rd+(x[0],)
             table_info=request_def
             intent_list = query_db('select user_request_intent_id,intent_name from user_request_intent')
-        if cur_table=='scenario':
+
+            response = render_template('manage.html', table_info=table_info, tables=tables, cur_table=cur_table,
+                                   intent_list=intent_list)
+            return response
+        elif cur_table=='scenario':
             user_intent = query_db('select user_request_intent_id,intent_name from user_request_intent')
             muba_intent = query_db('select muba_response_intent_id,intent_name from muba_response_intent')
             scenario=query_db('select * from scenario')
@@ -288,4 +295,4 @@ def add_static_conv():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=9999)
+    app.run(host='0.0.0.0', port=5002)
