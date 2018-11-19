@@ -88,7 +88,11 @@ def muba_response(msg, cur_scenario, priv_intent,argv):
                 ##TODO bug 처음부터 없는거 들어오면 다 무한루프)
                 new_argv={'user':argv['user']}
                 # input('>')
-                return muba_response(orig_msg,-1,['1',],new_argv)#muba_msg, func, cur_scenario, priv_intent
+                if cur_scenario==-2:
+                    muba_msg = static_response(msg)  # MR.make_reply(msg)
+                    func = ''
+                    return muba_msg, func, cur_scenario, priv_intent, argv
+                return muba_response(orig_msg,-2,['1',],new_argv)#muba_msg, func, cur_scenario, priv_intent
 
     else:
         if cur_scenario!=-1:

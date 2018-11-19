@@ -18,7 +18,7 @@ def find_intent_hard(msg):
 def intent_scenario_conformity_check(scenario_id,intent_list):
     conn = sqlite3.connect('chatbotdb.db')
     cur = conn.cursor()
-    if(scenario_id==-1):
+    if(scenario_id==-1 or scenario_id==-2):
         conn.close()
         return False
     sql="select scenario from scenario where scenario_id = ?"
